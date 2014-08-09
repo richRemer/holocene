@@ -1,0 +1,25 @@
+{
+  "name": "holocene",
+  "version": "0.0.1",
+  "description": "Graph database",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "devDependencies": {
+    "mocha": "~1.21"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/richRemer/holocene.git"
+  },
+  "keywords": [
+    "json",
+    "hal"
+  ],
+  "author": "Richard Remer (reanjr@gmail.com)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/richRemer/holocene/issues"
+  }
+}
