@@ -15,8 +15,9 @@ Create a new database by making an HTTP PUT request to the database URI.
 
 ```
 PUT /mydb HTTP/1.0
+```
 
-
+```
 201 Created
 ```
 
@@ -30,8 +31,9 @@ Content-Type: application/json
 Content-Length: 13
 
 {"foo":"you"}
+```
 
-
+```
 201 Created
 ```
 
@@ -40,7 +42,9 @@ Make a GET request to the document URI to retrieve a document from the database.
 
 ```
 GET /mydb/first_doc HTTP/1.0
+```
 
+```
 200 OK
 Content-Type: application/json
 Content-Length: 13
@@ -58,8 +62,9 @@ Content-Length: 7
 Link: <first_doc>; rel=parent
 
 {"a":1}
+```
 
-
+```
 201 Created
 ```
 
@@ -72,8 +77,9 @@ database in lieu of a JSON document.
 ```
 GET /mydb/second_doc HTTP/1.0
 Content-Type: application/hal+json
+```
 
-
+```
 200 OK
 Content-Type: application/hal+json
 Content-Length: 54
@@ -86,8 +92,9 @@ HTTP header.
 
 ```
 GET /mydb/second_doc HTTP/1.0
+```
 
-
+```
 200 OK
 Content-Type: application/json
 Content-Length: 7
@@ -106,8 +113,9 @@ Content-Type: application/hal+json
 Content-Length: 63
 
 {"_links":{"item":[{"href":"first_doc"},{"href":"second_doc"}]}
+```
 
-
+```
 201 Created
 ```
 
