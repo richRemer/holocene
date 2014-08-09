@@ -119,3 +119,68 @@ Content-Length: 63
 201 Created
 ```
 
+### Traversing the graph
+Append link relationships to the URL to traverse the graph and return the
+result.
+
+```
+GET /mydb/second_doc/parent HTTP/1.0
+```
+
+```
+200 OK
+Content-Type: application/json
+Content-Length: 13
+Link: </mydb/first_doc>; rel=canonical
+
+{"foo":"you"}
+```
+
+### Retrieving multiple results when traversing the graph
+If a graph traversal results in multiple documents, the response will be empty,
+but the result URIs can be found in the Link header.
+
+```
+GET /mydb/docs HTTP/1.0
+```
+
+```
+204 No Content
+Link: </mydb/first_doc>; rel=item
+Link: </mydb/second_doc>; rel=item
+```
+
+### Embedding result links into a document
+As with documents, graph results can be returned as a HAL document to get links
+embedded into the document.
+
+```
+GET /mydb/docs HTTP/1.0
+Accept: application/hal+json
+```
+
+```
+200 OK
+Content-Type: application/hal+json
+Content-Length: 76
+
+{"_links":{"item":[{"href":"/mydb/first_doc"},{"href":"/mydb/second_doc"}]}}
+```
+
+### Embedding the full results into a document
+To save round trips to the database, result documents can be returned as a list
+of embedded documents.  This can be requested by appending the "embed-doc"
+query parameter to the URL.  The response will be a HAL document.
+
+```
+GET /mydb/docs?embed-doc HTTP/1.0
+```
+
+```
+200 OK
+Content-Type: application/hal+json
+Content-Length: 167
+
+{"_embedded":{"item":[{"_links":{"self":{"href":"/mydb/first_doc"}},"foo":"you"},{"_links":{"self":{"href":"/mydb/second_doc"},"parent":{"href":"/mydb/first_doc"}}}]}}
+```
+
