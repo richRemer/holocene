@@ -20,7 +20,7 @@ describe("holocene", function() {
 
 describe("Holocene", function() {
     var db = new Holocene(),
-        dbName;
+        dbNames = [];
     
     describe(".keygen", function() {
         it("should generate a random string of hex characters", function() {
@@ -36,13 +36,17 @@ describe("Holocene", function() {
     describe(".createDb", function() {
         it("should not generate an error", function(done) {
             db.datadir = "/tmp";
-            db.createDb(Holocene.keygen(), done);
+            db.createDb(Holocene.keygen(), function(err, name) {
+                dbNames.push(name);
+                done(err);
+            });
         });
     
         it("should pass created DB name to the callback", function(done) {
             var dbName = Holocene.keygen();
             db.datadir = "/tmp";
             db.createDb(dbName, function(err, name) {
+                dbNames.push(name);
                 expect(name).to.equal(dbName);
                 done(err);
             });
@@ -51,6 +55,7 @@ describe("Holocene", function() {
         it("should generate random DB name as needed", function(done) {
             db.datadir = "/tmp";
             db.createDb(function(err, name) {
+                dbNames.push(name);
                 expect(name).to.be.a("string");
                 done(err);
             });
@@ -71,5 +76,46 @@ describe("Holocene", function() {
                 done();
             });
         });
+        
+        it("should error if DB already exists", function(done) {
+            db.createDb(dbNames[0], function(err, name) {
+                expect(err).to.be.an(Error);
+                done();
+            });
+        });
+    });
+    
+    describe(".dropDb", function() {
+        it("should delete an existing DB", function(done) {
+            var dbName = dbNames[0];
+            db.datadir = "/tmp";
+            
+            db.dropDb(dbName, function(err) {
+                if (err) return done(err);
+
+                // recreate DB to ensure it was deleted
+                db.createDb(dbName, function(err) {
+                    if (err) return done(err);
+                    done();
+                });
+            });
+        });
+        
+        it("should not error if DB does not exist", function(done) {
+            db.dropDb(Holocene.keygen(), done);
+        });
+    });
+    
+    after(function(done) {
+        var wait = 0;
+        dbNames.forEach(function(dbName) {
+            wait++;
+            console.log(dbName);
+            db.dropDb(dbName, function() {
+                if (--wait === 0) {
+                    done();
+                }
+            });
+        });        
     });
 });
