@@ -21,14 +21,38 @@ describe("holocene", function() {
 describe("Holocene", function() {
     var db = new Holocene(),
         dbName;
-        
+    
+    describe(".keygen", function() {
+        it("should generate a random string of hex characters", function() {
+            var key1 = Holocene.keygen(),
+                key2 = Holocene.keygen();
+            
+            expect(key1).to.be.a("string");
+            expect(key1.match(/^[0-9a-f]+$/)).to.be.ok();
+            expect(key1).to.not.equal(key2);
+        });
+    });
+    
     describe(".createDb", function() {
-        it("should generate DB and provide the db name", function(done) {
+        it("should not generate an error", function(done) {
+            db.datadir = "/tmp";
+            db.createDb(Holocene.keygen(), done);
+        });
+    
+        it("should pass created DB name to the callback", function(done) {
+            var dbName = Holocene.keygen();
+            db.datadir = "/tmp";
+            db.createDb(dbName, function(err, name) {
+                expect(name).to.equal(dbName);
+                done(err);
+            });
+        });
+    
+        it("should generate random DB name as needed", function(done) {
             db.datadir = "/tmp";
             db.createDb(function(err, name) {
                 expect(name).to.be.a("string");
-                dbName = name;
-                done(err, name);
+                done(err);
             });
         });
     
