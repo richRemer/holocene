@@ -35,7 +35,6 @@ describe("Holocene", function() {
     
     describe(".createDb", function() {
         it("should not generate an error", function(done) {
-            db.datadir = "/tmp";
             db.createDb(Holocene.keygen(), function(err, name) {
                 dbNames.push(name);
                 done(err);
@@ -44,7 +43,6 @@ describe("Holocene", function() {
     
         it("should pass created DB name to the callback", function(done) {
             var dbName = Holocene.keygen();
-            db.datadir = "/tmp";
             db.createDb(dbName, function(err, name) {
                 dbNames.push(name);
                 expect(name).to.equal(dbName);
@@ -53,27 +51,10 @@ describe("Holocene", function() {
         });
     
         it("should generate random DB name as needed", function(done) {
-            db.datadir = "/tmp";
             db.createDb(function(err, name) {
                 dbNames.push(name);
                 expect(name).to.be.a("string");
                 done(err);
-            });
-        });
-    
-        it("should error if datadir is not set", function(done) {
-            db.datadir = null;
-            db.createDb(function(err) {
-                expect(err).to.be.an(Error);
-                done();
-            });
-        });
-        
-        it("should error if datadir does not exist", function(done) {
-            db.datadir = "non-existent-test-directory/asdfsakjfdh";
-            db.createDb(function(err) {
-                expect(err).to.be.an(Error);
-                done();
             });
         });
         
@@ -110,7 +91,6 @@ describe("Holocene", function() {
         var wait = 0;
         dbNames.forEach(function(dbName) {
             wait++;
-            console.log(dbName);
             db.dropDb(dbName, function() {
                 if (--wait === 0) {
                     done();
