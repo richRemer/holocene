@@ -7,8 +7,29 @@ goals:
  * holocene should be RESTful; features should look first to the
    HTTP standard as a guide 
 
-Working with Holocene
----------------------
+Setup Holocene Metadata
+-----------------------
+By default, holocene supports JSON and HAL data and a small set of predefined
+relationships.  Each database has its own metadata store which can be used to
+configure the database.
+
+### Define a relationship
+Holocene documents can be linked using relationships.  A relationship must be
+defined for the database before a link can be created with that relationship.
+
+```
+POST /mydb!rels HTTP/1.0
+Content-Type: application/json
+Content-Length: 
+
+{
+    "rel": "parent",
+    "rev": "child"
+}
+```
+
+Working with the Holocene REST API
+----------------------------------
 
 ### Creating a database
 Create a new database by making an HTTP PUT request to the database URI.
@@ -183,4 +204,3 @@ Content-Length: 167
 
 {"_embedded":{"item":[{"_links":{"self":{"href":"/mydb/first_doc"}},"foo":"you"},{"_links":{"self":{"href":"/mydb/second_doc"},"parent":{"href":"/mydb/first_doc"}}}]}}
 ```
-
