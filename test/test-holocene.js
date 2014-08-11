@@ -64,6 +64,25 @@ describe("Resource", function() {
         });
     });
 
+    describe(".writeObject", function() {
+        it("should store and emit key and JSON data result", function(done) {
+            var data = {"a":1};
+            res.writeObject(data, function(err, key, obj) {
+                expect(obj).to.be.eql(data);
+            });
+        });
+    });
+
+    describe(".readObject", function() {
+        it("should read JSON data from the database", function(done) {
+            res.writeObject({"a":1}, function(err, key) {
+                res.readObject(key, function(err, obj) {
+                    expect(obj).to.be.eql({"a":1});
+                });
+            });
+        });
+    });
+
     after(function(done) {
         fs.rmrf(dbPath, done);
     });
