@@ -116,8 +116,11 @@ describe("Holocene", function() {
             });
         });
         
-        it("should not error if DB does not exist", function(done) {
-            holo.dropDb(Holocene.keygen(), done);
+        it("should error if DB does not exist", function(done) {
+            holo.dropDb(Holocene.keygen(), function(err) {
+                expect(err).to.be.an(Error);
+                done();
+            });
         });
     });
     
@@ -141,7 +144,10 @@ describe("Holocene", function() {
     });
 
     after(function(done) {
-        holo.dropDb("_holocene_test_db_", done);
+        testdb.close(function(err) {
+            if (err) throw err;
+            else holo.dropDb("_holocene_test_db_", done);
+        });
     });
 });
 
