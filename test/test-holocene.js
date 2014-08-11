@@ -85,6 +85,15 @@ describe("Holocene", function() {
         });
     });
     
+    describe(".openDb", function() {
+        it("should open existing DB and pass DB object", function(done) {
+            holo.openDb("_holocene_test_db_", function(err, db) {
+                expect(db).to.be.a(Database);
+                done(err);
+            });
+        });
+    });
+    
     after(function(done) {
         holo.dropDb("_holocene_test_db_", done);
     });
