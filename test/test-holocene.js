@@ -73,7 +73,7 @@ describe("Database", function() {
     var holo = new Holocene(),
         dbName = Holocene.keygen(),
         dbPath = path.join(holo.datadir, dbName);
-        db = new Database(holo, dbName, dbPath);
+        db = new Database(holo, dbName, dbPath),
     
     before(function(done) {
         fs.mkdir(dbPath, done);
@@ -108,6 +108,63 @@ describe("Database", function() {
         });
     });
     
+    describe(".createRes", function() {
+        var resName = Holocene.keygen();
+
+        it("should create and emit a new resource", function(done) {
+            db.createRes(resName, function(err, res) {
+                expect(res).to.be.a(Resource);
+                done(err);
+            });
+        });
+        
+        it("should emit error if resource already exists", function(done) {
+            db.createRes(resName, function(err, res) {
+                expect(err).to.be.an(Error);
+                done();
+            });
+        });
+    });
+    
+    describe(".createRes without name", function() {
+        it("should generate random name", function(done) {
+            db.createRes(function(err, res) {
+                expect(res.name.match(/^[0-9a-f]+$/)).to.be.ok();
+                done(err);
+            });
+        });
+    });
+    
+    describe(".dropRes", function() {
+        it("should remove resource from DB", function(done) {
+            db.createRes(function(err, res) {
+                if (err) done(err);
+                else db.dropRes(res.name, function(err) {
+                    if (err) done(err);
+                    else db.createRes(res.name, done);
+                });
+            });
+        });
+    });
+
+    describe(".lockRes", function() {
+        var resName;
+
+        it("should lock and emit existing resource", function(done) {
+            db.createRes(function(err, res) {
+                if (err) done(err);
+                else db.lockRes(resName = res.name, done);
+            });
+        });
+
+        it("should emit error if already locked", function(done) {
+            db.lockRes(resName, function(err) {
+                expect(err).to.be.an(Error);
+                done();
+            });
+        });
+    });
+
     after(function(done) {
         fs.rmrf(dbPath, done);
     });
