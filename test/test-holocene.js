@@ -1,6 +1,7 @@
 var holocene = require(".."),
     Holocene = require("../lib/holocene"),
     Database = require("../lib/database"),
+    Resource = require("../lib/resource"),
     expect = require("expect.js"),
     path = require("path"),
     fs = require("fs.extra");
@@ -18,6 +19,53 @@ describe("holocene", function() {
             expect(app.listen).to.be.a("function");
             expect(app.route).to.be.a("function");
         });
+    });
+});
+
+describe("Resource", function() {
+    var holo = new Holocene(),
+        dbName = Holocene.keygen(),
+        dbPath = path.join(holo.datadir, dbName),
+        db = new Database(holo, dbName, dbPath),
+        resName = Holocene.keygen(),
+        resPath = path.join(dbPath, resName),
+        res = new Resource(db, resName, resPath);
+    
+    before(function(done) {
+        fs.mkdirp(resPath, done);
+    });
+    
+    it("should be initialized in unlocked state", function() {
+        expect(res.locked).to.not.be.ok();
+    });
+    
+    describe(".lock", function() {
+        it("should lock the resource", function(done) {
+            res.lock(function(err) {
+                expect(res.locked).to.be.ok();
+                done(err);
+            });
+        });
+        
+        it("should emit error if already locked", function(done) {
+            res.lock(function(err) {
+                expect(err).to.be.an(Error);
+                done();
+            });
+        });
+    });
+    
+    describe(".unlock", function() {
+        it("should unlock the resource", function(done) {
+            res.unlock(function(err) {
+                expect(res.locked).to.not.be.ok();
+                done(err);
+            });
+        });
+    });
+
+    after(function(done) {
+        fs.rmrf(dbPath, done);
     });
 });
 
@@ -43,7 +91,7 @@ describe("Database", function() {
             });
         });
         
-        it("should pass error if already locked", function(done) {
+        it("should emit error if already locked", function(done) {
             db.open(function(err) {
                 expect(err).to.be.an(Error);
                 done();
@@ -95,12 +143,12 @@ describe("Holocene", function() {
             done(e);
         });
     
-        it("should pass Database argument to the callback", function() {
+        it("should emit Database result", function() {
             // testdb will get set in the test case "before"
             expect(testdb).to.be.a(Database);
         });
     
-        it("should pass Error if DB already exists", function(done) {
+        it("should emit Error if DB already exists", function(done) {
             holo.createDb("_holocene_test_db_", function(err, db) {
                 expect(err).to.be.an(Error);
                 done();
@@ -135,7 +183,7 @@ describe("Holocene", function() {
     });
     
     describe(".openDb", function() {
-        it("should open existing DB and pass DB object", function(done) {
+        it("should open existing DB and emit DB result", function(done) {
             holo.openDb("_holocene_test_db_", function(err, db) {
                 expect(db).to.be.a(Database);
                 done(err);
