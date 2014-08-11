@@ -11,7 +11,7 @@ Setup Holocene Metadata
 -----------------------
 By default, holocene supports JSON and HAL data and a small set of predefined
 relationships.  Each database has its own metadata store which can be used to
-configure the database.
+configure the database and add new types and relationships.
 
 ### Define a relationship
 Holocene documents can be linked using relationships.  A relationship must be
