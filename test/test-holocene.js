@@ -25,7 +25,7 @@ describe("holocene", function() {
 describe("Resource", function() {
     var holo = new Holocene(),
         dbName = Holocene.keygen(),
-        dbPath = path.join(holo.datadir, dbName),
+        dbPath = path.join(holo.path, dbName),
         db = new Database(holo, dbName, dbPath),
         resName = Holocene.keygen(),
         resPath = path.join(dbPath, resName),
@@ -72,7 +72,7 @@ describe("Resource", function() {
 describe("Database", function() {
     var holo = new Holocene(),
         dbName = Holocene.keygen(),
-        dbPath = path.join(holo.datadir, dbName);
+        dbPath = path.join(holo.path, dbName);
         db = new Database(holo, dbName, dbPath),
     
     before(function(done) {
