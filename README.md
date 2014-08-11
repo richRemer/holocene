@@ -17,7 +17,7 @@ embedding into Javascript apps.
 To begin using the Javascript API, import the `Holocene` class from the holocene
 package and create an instance.
 
-```
+```javascript
 var Holocene = require("holocene").Holocene(),
     holo = new Holocene();
 ```
@@ -29,7 +29,7 @@ almost every method in the Holocene library, this method takes a callback as its
 last parameter to receive any error or result.  In this case, the result is the
 database object for the new database.
 
-```
+```javascript
 holo.createDb(function(err, db) {
     if (err) throw err;
     console.log("successfully created database named " + db.name);
@@ -39,7 +39,7 @@ holo.createDb(function(err, db) {
 The optional first argument to the `createDb` method - *`name`* - can be used to
 set the database name.
 
-```
+```javascript
 var db;
 holo.createDb("example", function(err, result) {
     if (err) throw err;
@@ -53,7 +53,7 @@ obtain a database lock before performing many kinds of changes to the database. 
 do **NOT** need to lock the database to update an existing resource, but you *DO* need
 to lock the database to create a new resource or delete an existing one.
 
-```
+```javascript
 // boilerplate for executing updates inside a lock
 db.lock(function(err) {
     if (err) throw err;
@@ -72,7 +72,7 @@ more documents associated with it and a number of links relating the resource to
 other resources in the database or to external resources referred to by absolute URL.
 To create a new resource, use the `createRes` method of the `Database` object.
 
-```
+```javascript
 // this snippet should go inside something like the locking boilerplate above
 db.createRes(function(err, res) {
     if (err) throw err;
@@ -84,7 +84,7 @@ db.createRes(function(err, res) {
 Before resources can be linked, relationships must be defined for the links.  To
 define a new relationship, use the `createRel` method of the `Database` object.
 
-```
+```javascript
 // this must occur while the DB is locked
 db.createRel("parent", {"cardinality": "single"}, function(err, rel) {
     if (err) throw err;
