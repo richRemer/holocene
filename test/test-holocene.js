@@ -83,25 +83,25 @@ describe("Database", function() {
         expect(db.locked).to.not.be.ok();
     });
     
-    describe(".open", function() {
+    describe(".lock", function() {
         it("should lock the database", function(done) {
-            db.open(function(err) {
+            db.lock(function(err) {
                 expect(db.locked).to.be.ok();
                 done(err);
             });
         });
         
         it("should emit error if already locked", function(done) {
-            db.open(function(err) {
+            db.lock(function(err) {
                 expect(err).to.be.an(Error);
                 done();
             });
         });
     });
     
-    describe(".close", function() {
+    describe(".unlock", function() {
         it("should unlock the database", function(done) {
-            db.close(function(err) {
+            db.unlock(function(err) {
                 expect(db.locked).to.not.be.ok();
                 done(err);
             });
@@ -239,9 +239,9 @@ describe("Holocene", function() {
         });
     });
     
-    describe(".openDb", function() {
-        it("should open existing DB and emit DB result", function(done) {
-            holo.openDb("_holocene_test_db_", function(err, db) {
+    describe(".lockDb", function() {
+        it("should lock existing DB and emit DB result", function(done) {
+            holo.lockDb("_holocene_test_db_", function(err, db) {
                 expect(db).to.be.a(Database);
                 done(err);
             });
@@ -249,7 +249,7 @@ describe("Holocene", function() {
     });
 
     after(function(done) {
-        testdb.close(function(err) {
+        testdb.unlock(function(err) {
             if (err) throw err;
             else holo.dropDb("_holocene_test_db_", done);
         });
