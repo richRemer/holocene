@@ -1,5 +1,6 @@
 var holocene = require(".."),
     Holocene = require("../lib/holocene"),
+    Database = require("../lib/database"),
     expect = require("expect.js");
 
 describe("holocene", function() {
@@ -19,8 +20,16 @@ describe("holocene", function() {
 });
 
 describe("Holocene", function() {
-    var db = new Holocene(),
-        dbNames = [];
+    var holo = new Holocene(),
+        testdb, e;
+        
+    before(function(done) {
+        holo.createDb("_holocene_test_db_", function(err, db) {
+            testdb = db;
+            e = err;
+            done();
+        });
+    });
     
     describe(".keygen", function() {
         it("should generate a random string of hex characters", function() {
@@ -35,31 +44,18 @@ describe("Holocene", function() {
     
     describe(".createDb", function() {
         it("should not generate an error", function(done) {
-            db.createDb(Holocene.keygen(), function(err, name) {
-                dbNames.push(name);
-                done(err);
-            });
+            // e will get set in the test case "before" if there is
+            // an error
+            done(e);
         });
     
-        it("should pass created DB name to the callback", function(done) {
-            var dbName = Holocene.keygen();
-            db.createDb(dbName, function(err, name) {
-                dbNames.push(name);
-                expect(name).to.equal(dbName);
-                done(err);
-            });
+        it("should pass Database argument to the callback", function() {
+            // testdb will get set in the test case "before"
+            expect(testdb).to.be.a(Database);
         });
     
-        it("should generate random DB name as needed", function(done) {
-            db.createDb(function(err, name) {
-                dbNames.push(name);
-                expect(name).to.be.a("string");
-                done(err);
-            });
-        });
-        
-        it("should error if DB already exists", function(done) {
-            db.createDb(dbNames[0], function(err, name) {
+        it("should pass Error if DB already exists", function(done) {
+            holo.createDb("_holocene_test_db_", function(err, db) {
                 expect(err).to.be.an(Error);
                 done();
             });
@@ -68,34 +64,28 @@ describe("Holocene", function() {
     
     describe(".dropDb", function() {
         it("should delete an existing DB", function(done) {
-            var dbName = dbNames[0];
-            db.datadir = "/tmp";
-            
-            db.dropDb(dbName, function(err) {
+            holo.dropDb("_holocene_test_db_", function(err) {
                 if (err) return done(err);
-
-                // recreate DB to ensure it was deleted
-                db.createDb(dbName, function(err) {
-                    if (err) return done(err);
-                    done();
-                });
+                holo.createDb("_holocene_test_db_", done);
             });
         });
         
         it("should not error if DB does not exist", function(done) {
-            db.dropDb(Holocene.keygen(), done);
+            holo.dropDb(Holocene.keygen(), done);
+        });
+    });
+    
+    describe(".createDb without DB name", function() {
+        it("should generate random name", function(done) {
+            holo.createDb(function(err, db) {
+                expect(db.name.match(/^[0-9a-f]+$/)).to.be.ok();
+                if (!err) holo.dropDb(db.name);
+                done(err);
+            });
         });
     });
     
     after(function(done) {
-        var wait = 0;
-        dbNames.forEach(function(dbName) {
-            wait++;
-            db.dropDb(dbName, function() {
-                if (--wait === 0) {
-                    done();
-                }
-            });
-        });        
+        holo.dropDb("_holocene_test_db_", done);
     });
 });
