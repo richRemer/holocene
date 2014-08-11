@@ -1,7 +1,9 @@
 var holocene = require(".."),
     Holocene = require("../lib/holocene"),
     Database = require("../lib/database"),
-    expect = require("expect.js");
+    expect = require("expect.js"),
+    path = require("path"),
+    fs = require("fs.extra");
 
 describe("holocene", function() {
     it("should export a function", function() {
@@ -16,6 +18,50 @@ describe("holocene", function() {
             expect(app.listen).to.be.a("function");
             expect(app.route).to.be.a("function");
         });
+    });
+});
+
+describe("Database", function() {
+    var holo = new Holocene(),
+        dbName = Holocene.keygen(),
+        dbPath = path.join(holo.datadir, dbName);
+        db = new Database(holo, dbName, dbPath);
+    
+    before(function(done) {
+        fs.mkdir(dbPath, done);
+    });
+    
+    it("should be initialized in unlocked state", function() {
+        expect(db.locked).to.not.be.ok();
+    });
+    
+    describe(".open", function() {
+        it("should lock the database", function(done) {
+            db.open(function(err) {
+                expect(db.locked).to.be.ok();
+                done(err);
+            });
+        });
+        
+        it("should pass error if already locked", function(done) {
+            db.open(function(err) {
+                expect(err).to.be.an(Error);
+                done();
+            });
+        });
+    });
+    
+    describe(".close", function() {
+        it("should unlock the database", function(done) {
+            db.close(function(err) {
+                expect(db.locked).to.not.be.ok();
+                done(err);
+            });
+        });
+    });
+    
+    after(function(done) {
+        fs.rmrf(dbPath, done);
     });
 });
 
@@ -93,8 +139,9 @@ describe("Holocene", function() {
             });
         });
     });
-    
+
     after(function(done) {
         holo.dropDb("_holocene_test_db_", done);
     });
 });
+
